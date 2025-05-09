@@ -90,7 +90,9 @@ with st.sidebar:
 
     tickers_list = [
         'AAPL', 'MSFT', 'TSLA', 'GOOGL', 'AMZN', 'NFLX', 'QQQ', 'SPY',
-        'BTC-USD', 'ETH-USD', 'FB', 'NVDA', '^GSPC', '^DJI', '^NDX', '^RUT', '^VIX'
+        'BTC-USD', 'ETH-USD', 'META', 'NVDA', '^GSPC', '^DJI', '^NDX', '^RUT', '^VIX',
+        'BA', 'DIS', 'NVDA', 'GS', 'INTC', 'IBM', 'SNAP', 'TWTR', 'SPY', 'IWM', 'SPX',
+        'XOM', 'TSM', 'PYPL', 'NFLX', 'UBER', 'SQ', 'BABA', 'TWLO', 'MS', 'GS', 'BIDU'
     ]
     selected_tickers = st.multiselect("Выберите активы", tickers_list, default=["AAPL", "MSFT"])
 
