@@ -47,6 +47,20 @@ def plot_returns(df):
     )
     return fig
 
+def plot_cumulative_returns(df):
+    returns = df.pct_change().dropna()
+    cumulative_returns = (1 + returns).cumprod()
+    fig = go.Figure()
+    for column in cumulative_returns.columns:
+        fig.add_trace(go.Scatter(x=cumulative_returns.index, y=cumulative_returns[column], mode='lines', name=column))
+    fig.update_layout(
+        title='Накопленная доходность активов',
+        xaxis_title='Дата',
+        yaxis_title='Доходность',
+        template='plotly_dark'
+    )
+    return fig
+
 def plot_correlation(df):
     returns = df.pct_change().dropna()
     correlation_matrix = returns.corr()
@@ -67,6 +81,10 @@ with st.sidebar:
     start_date = st.date_input("Дата начала", pd.to_datetime("2020-01-01"))
     end_date = st.date_input("Дата конца", pd.to_datetime("2023-12-31"))
 
+    if start_date >= end_date:
+        st.error("❗ Дата начала должна быть раньше даты конца.")
+        st.stop()
+
     tickers_list = [
         'AAPL', 'MSFT', 'TSLA', 'GOOGL', 'AMZN', 'NFLX', 'QQQ', 'SPY',
         'BTC-USD', 'ETH-USD', 'FB', 'NVDA', '^GSPC', '^DJI', '^NDX', '^RUT', '^VIX'
@@ -80,12 +98,16 @@ with st.sidebar:
 if "run_analysis" in st.session_state and st.session_state["run_analysis"]:
     df = load_data(selected_tickers, start_date, end_date)
 
+    if isinstance(df, pd.Series):
+        df = df.to_frame()
+
     if df.empty or df.dropna().empty:
         st.warning("Нет данных для отображения. Проверьте выбранные активы или даты.")
     else:
         # Графики
         st.plotly_chart(plot_price_changes(df), use_container_width=True)
         st.plotly_chart(plot_returns(df), use_container_width=True)
+        st.plotly_chart(plot_cumulative_returns(df), use_container_width=True)
         st.plotly_chart(plot_correlation(df), use_container_width=True)
 
         # Таблица describe
