@@ -12,7 +12,6 @@ def load_data(tickers, start_date, end_date):
     if isinstance(data.columns, pd.MultiIndex):
         df = data['Close']
     else:
-        # Если один тикер — делаем to_frame
         df = data.to_frame(name=tickers if isinstance(tickers, str) else tickers[0])
 
     return df.dropna(how='all')
@@ -79,6 +78,15 @@ def plot_correlation(df):
 # 👉 Интерфейс Streamlit
 st.title("📊 Анализ активов")
 
+# Инициализация session_state для тикеров
+if "tickers_list" not in st.session_state:
+    st.session_state.tickers_list = [
+        'AAPL', 'MSFT', 'TSLA', 'GOOGL', 'AMZN', 'NFLX', 'QQQ', 'SPY',
+        'BTC-USD', 'ETH-USD', 'META', 'NVDA', '^GSPC', '^DJI', '^NDX', '^RUT', '^VIX',
+        'BA', 'DIS', 'NVDA', 'GS', 'INTC', 'IBM', 'SNAP', 'TWTR', 'SPY', 'IWM', 'SPX',
+        'XOM', 'TSM', 'PYPL', 'NFLX', 'UBER', 'SQ', 'BABA', 'TWLO', 'MS', 'GS', 'BIDU'
+    ]
+
 with st.sidebar:
     st.header("Параметры")
     start_date = st.date_input("Дата начала", pd.to_datetime("2020-01-01"))
@@ -88,34 +96,22 @@ with st.sidebar:
         st.error("❗ Дата начала должна быть раньше даты конца.")
         st.stop()
 
-    # Начальный список тикеров
-    tickers_list = [
-        'AAPL', 'MSFT', 'TSLA', 'GOOGL', 'AMZN', 'NFLX', 'QQQ', 'SPY',
-        'BTC-USD', 'ETH-USD', 'META', 'NVDA', '^GSPC', '^DJI', '^NDX', '^RUT', '^VIX',
-        'BA', 'DIS', 'NVDA', 'GS', 'INTC', 'IBM', 'SNAP', 'TWTR', 'SPY', 'IWM', 'SPX',
-        'XOM', 'TSM', 'PYPL', 'NFLX', 'UBER', 'SQ', 'BABA', 'TWLO', 'MS', 'GS', 'BIDU'
-    ]
+    selected_tickers = st.multiselect(
+        "Выберите активы", st.session_state.tickers_list, default=["AAPL", "MSFT"]
+    )
 
-    # Выбор тикеров для анализа
-    selected_tickers = st.multiselect("Выберите активы", tickers_list, default=["AAPL", "MSFT"])
-
-    # Окно для добавления новых тикеров
     new_ticker = st.text_input("Добавьте свой тикер", "")
 
-    # Кнопка для добавления тикера в список
     if st.button("Добавить тикер"):
-        if new_ticker and new_ticker not in tickers_list:
-            tickers_list.append(new_ticker)
-            st.success(f"Тикер {new_ticker} был добавлен в список!")
-        elif new_ticker in tickers_list:
-            st.warning(f"Тикер {new_ticker} уже существует в списке.")
+        new_ticker = new_ticker.strip().upper()
+        if new_ticker and new_ticker not in st.session_state.tickers_list:
+            st.session_state.tickers_list.append(new_ticker)
+            st.success(f"✅ Тикер {new_ticker} добавлен в список.")
+        elif new_ticker in st.session_state.tickers_list:
+            st.warning(f"⚠️ Тикер {new_ticker} уже есть в списке.")
         else:
-            st.warning("Пожалуйста, введите тикер.")
+            st.warning("Введите тикер перед добавлением.")
 
-    # Обновляем мультивыбор с новыми тикерами
-    selected_tickers = st.multiselect("Выберите активы", tickers_list, default=["AAPL", "MSFT"])
-
-    # Обработка одного выбранного тикера
     if len(selected_tickers) == 1:
         selected_tickers = selected_tickers[0]
 
@@ -129,24 +125,20 @@ if "run_analysis" in st.session_state and st.session_state["run_analysis"]:
     if isinstance(df, pd.Series):
         df = df.to_frame()
 
-    # 👇 Отладка — показать первые строки (можно убрать потом)
     st.write("📦 Загруженные данные:", df.head())
 
     if df.empty or df.dropna().empty:
         st.warning("Нет данных для отображения. Проверьте выбранные активы или даты.")
     else:
-        # Графики
         st.plotly_chart(plot_price_changes(df), use_container_width=True)
         st.plotly_chart(plot_returns(df), use_container_width=True)
         st.plotly_chart(plot_cumulative_returns(df), use_container_width=True)
         st.plotly_chart(plot_correlation(df), use_container_width=True)
 
-        # Таблица describe
         st.subheader("📌 Сводная статистика (describe)")
         describe_df = df.describe().round(2)
         st.dataframe(describe_df)
 
-        # Кнопка скачать
         csv = df.to_csv(index=True).encode("utf-8")
         st.download_button(
             label="📥 Скачать CSV",
