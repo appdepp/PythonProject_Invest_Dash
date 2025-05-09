@@ -89,8 +89,8 @@ if "tickers_list" not in st.session_state:
 
 with st.sidebar:
     st.header("Параметры")
-    start_date = st.date_input("Дата начала", pd.to_datetime("2020-01-01"))
-    end_date = st.date_input("Дата конца", pd.to_datetime("2023-12-31"))
+    start_date = st.date_input("Дата начала", pd.to_datetime("2024-01-01"))
+    end_date = st.date_input("Дата конца", pd.to_datetime("2025-01-01"))
 
     if start_date >= end_date:
         st.error("❗ Дата начала должна быть раньше даты конца.")
