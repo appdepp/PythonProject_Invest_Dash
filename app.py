@@ -88,12 +88,31 @@ with st.sidebar:
         st.error("❗ Дата начала должна быть раньше даты конца.")
         st.stop()
 
+    # Начальный список тикеров
     tickers_list = [
         'AAPL', 'MSFT', 'TSLA', 'GOOGL', 'AMZN', 'NFLX', 'QQQ', 'SPY',
         'BTC-USD', 'ETH-USD', 'META', 'NVDA', '^GSPC', '^DJI', '^NDX', '^RUT', '^VIX',
         'BA', 'DIS', 'NVDA', 'GS', 'INTC', 'IBM', 'SNAP', 'TWTR', 'SPY', 'IWM', 'SPX',
         'XOM', 'TSM', 'PYPL', 'NFLX', 'UBER', 'SQ', 'BABA', 'TWLO', 'MS', 'GS', 'BIDU'
     ]
+
+    # Выбор тикеров для анализа
+    selected_tickers = st.multiselect("Выберите активы", tickers_list, default=["AAPL", "MSFT"])
+
+    # Окно для добавления новых тикеров
+    new_ticker = st.text_input("Добавьте свой тикер", "")
+
+    # Кнопка для добавления тикера в список
+    if st.button("Добавить тикер"):
+        if new_ticker and new_ticker not in tickers_list:
+            tickers_list.append(new_ticker)
+            st.success(f"Тикер {new_ticker} был добавлен в список!")
+        elif new_ticker in tickers_list:
+            st.warning(f"Тикер {new_ticker} уже существует в списке.")
+        else:
+            st.warning("Пожалуйста, введите тикер.")
+
+    # Обновляем мультивыбор с новыми тикерами
     selected_tickers = st.multiselect("Выберите активы", tickers_list, default=["AAPL", "MSFT"])
 
     # Обработка одного выбранного тикера
