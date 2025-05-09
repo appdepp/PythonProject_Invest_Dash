@@ -8,10 +8,13 @@ import plotly.express as px
 @st.cache_data
 def load_data(tickers, start_date, end_date):
     data = yf.download(tickers, start=start_date, end=end_date, auto_adjust=True)
+
     if isinstance(data.columns, pd.MultiIndex):
         df = data['Close']
     else:
-        df = data.to_frame(name=tickers[0])
+        # Если один тикер — делаем to_frame
+        df = data.to_frame(name=tickers if isinstance(tickers, str) else tickers[0])
+
     return df.dropna(how='all')
 
 def normalize_data(df):
@@ -91,6 +94,10 @@ with st.sidebar:
     ]
     selected_tickers = st.multiselect("Выберите активы", tickers_list, default=["AAPL", "MSFT"])
 
+    # Обработка одного выбранного тикера
+    if len(selected_tickers) == 1:
+        selected_tickers = selected_tickers[0]
+
     if st.button("🔄 Обновить данные"):
         st.session_state["run_analysis"] = True
 
@@ -100,6 +107,9 @@ if "run_analysis" in st.session_state and st.session_state["run_analysis"]:
 
     if isinstance(df, pd.Series):
         df = df.to_frame()
+
+    # 👇 Отладка — показать первые строки (можно убрать потом)
+    st.write("📦 Загруженные данные:", df.head())
 
     if df.empty or df.dropna().empty:
         st.warning("Нет данных для отображения. Проверьте выбранные активы или даты.")
