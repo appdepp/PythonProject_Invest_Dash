@@ -81,7 +81,7 @@ st.title("📊 Анализ активов")
 
 with st.sidebar:
     st.header("Параметры")
-    start_date = st.date_input("Дата начала", pd.to_datetime("2020-01-01"))
+    start_date = st.date_input("Дата начала", pd.to_datetime("2022-01-01"))
     end_date = st.date_input("Дата конца", pd.to_datetime("2023-12-31"))
 
     if start_date >= end_date:
@@ -103,7 +103,7 @@ with st.sidebar:
     new_ticker = st.text_input("Добавьте свой тикер", "")
 
     # Кнопка для добавления тикера в список
-    if st.button("Добавить тикер"):
+    if st.button("🧠Добавить тикер"):
         if new_ticker and new_ticker not in tickers_list:
             tickers_list.append(new_ticker)
             st.success(f"Тикер {new_ticker} был добавлен в список!")
