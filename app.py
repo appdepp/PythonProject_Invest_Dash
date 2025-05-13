@@ -178,16 +178,16 @@ if "run_analysis" in st.session_state and st.session_state["run_analysis"]:
         daily_returns = df.pct_change().dropna().round(4)
         st.dataframe(daily_returns)
 
-        # ✅ NEW: Bar Chart of Last Day Returns
-        st.subheader("📊 Last Day Returns")
-        if not daily_returns.empty and len(daily_returns) > 0:
-            last_day = daily_returns.iloc[-1]
-            last_day_df = pd.DataFrame(last_day).T
-            last_day_df.index = [last_day_df.index[0].strftime('%Y-%m-%d')]
-            st.bar_chart(last_day)
-            st.write("Last day returns:", last_day_df)
-        else:
-            st.warning("Not enough data to display last day returns.")
+        # # ✅ NEW: Bar Chart of Last Day Returns
+        # st.subheader("📊 Last Day Returns")
+        # if not daily_returns.empty and len(daily_returns) > 0:
+        #     last_day = daily_returns.iloc[-1]
+        #     last_day_df = pd.DataFrame(last_day).T
+        #     last_day_df.index = [last_day_df.index[0].strftime('%Y-%m-%d')]
+        #     st.bar_chart(last_day)
+        #     st.write("Last day returns:", last_day_df)
+        # else:
+        #     st.warning("Not enough data to display last day returns.")
 
         # Summary Statistics
         st.subheader("📌 Summary Statistics")
